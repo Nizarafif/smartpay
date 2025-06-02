@@ -20,17 +20,14 @@ export default function Sidebar({ collapsed, toggle }) {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [animateModal, setAnimateModal] = useState(false);
 
-  // Saat showLogoutModal berubah jadi true, kita trigger animasi masuk
   useEffect(() => {
     if (showLogoutModal) {
       setAnimateModal(true);
     }
   }, [showLogoutModal]);
 
-  // Fungsi untuk menutup modal dengan animasi keluar dulu
   function closeModal() {
     setAnimateModal(false);
-    // Setelah animasi selesai, sembunyikan modal (waktu animasi 300ms)
     setTimeout(() => setShowLogoutModal(false), 300);
   }
 
@@ -49,14 +46,13 @@ export default function Sidebar({ collapsed, toggle }) {
         <div className="p-4">
           {/* Logo + Toggle */}
           <div
-            className="flex items-center justify-between mb-8"
+            className="flex flex-col items-center justify-center mb-8 relative"
             style={{ minHeight: '3.5rem' }}
           >
             <h1
-              className={`text-2xl font-extrabold text-teal-600 tracking-wide select-none overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out font-poppins
-                ${
-                  collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[200px]'
-                }`}
+              className={`text-3xl font-black text-teal-600 tracking-wide select-none overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out font-poppins text-center
+                ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[200px]'}
+              `}
               style={{ transitionProperty: 'opacity, max-width' }}
             >
               Smart<span className="text-gray-800">Pay</span>
@@ -64,7 +60,7 @@ export default function Sidebar({ collapsed, toggle }) {
 
             <button
               onClick={toggle}
-              className="p-2 rounded-md hover:bg-teal-100 text-teal-600 transition-colors"
+              className="absolute top-0 right-0 p-2 rounded-md hover:bg-teal-100 text-teal-600 transition-colors"
               title="Toggle Sidebar"
             >
               {collapsed ? <Menu size={24} /> : <X size={24} />}
