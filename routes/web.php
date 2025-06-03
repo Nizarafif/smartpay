@@ -36,6 +36,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/data-dosen/create', [DosenController::class, 'create'])->name('data-dosen.create');
     Route::post('/data-dosen', [DosenController::class, 'store'])->name('data-dosen.store');
     Route::delete('/data-dosen/{id}', [DosenController::class, 'destroy'])->name('data-dosen.destroy');
+
+    // ✅ Gaji Dosen – Tambahkan ini
+    Route::get('/gaji-dosen', function () {
+        $dosens = Dosen::select('nama', 'nidn', 'email', 'sudah_dibayar')->get();
+        return Inertia::render('GajiDosen', [
+            'dosens' => $dosens,
+        ]);
+    })->name('gaji-dosen.index');
 });
 
+// Auth routes
 require __DIR__.'/auth.php';

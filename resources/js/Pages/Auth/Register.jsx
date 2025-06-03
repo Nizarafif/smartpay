@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { motion } from 'framer-motion';
+import { useState } from 'react'; // tambahkan ini
 import ApplicationLogo from '@/Components/ApplicationLogo';
 
 export default function Register() {
@@ -9,6 +10,9 @@ export default function Register() {
         password: '',
         password_confirmation: '',
     });
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
     const submit = (e) => {
         e.preventDefault();
@@ -72,37 +76,55 @@ export default function Register() {
                             )}
                         </div>
 
-                        <div className="mb-4">
+                        {/* Password */}
+                        <div className="mb-4 relative">
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                                 Password
                             </label>
                             <input
                                 id="password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 required
                                 autoComplete="new-password"
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 pr-10"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute top-[38px] right-3 text-sm text-gray-600 focus:outline-none"
+                                tabIndex={-1}
+                            >
+                                {showPassword ? 'Hide' : 'Show'}
+                            </button>
                             {errors.password && (
                                 <p className="text-sm text-red-600 mt-1">{errors.password}</p>
                             )}
                         </div>
 
-                        <div className="mb-4">
+                        {/* Password Confirmation */}
+                        <div className="mb-4 relative">
                             <label htmlFor="password_confirmation" className="block text-sm font-medium text-gray-700">
                                 Confirm Password
                             </label>
                             <input
                                 id="password_confirmation"
-                                type="password"
+                                type={showPasswordConfirm ? 'text' : 'password'}
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 required
                                 autoComplete="new-password"
-                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 pr-10"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                                className="absolute top-[38px] right-3 text-sm text-gray-600 focus:outline-none"
+                                tabIndex={-1}
+                            >
+                                {showPasswordConfirm ? 'Hide' : 'Show'}
+                            </button>
                             {errors.password_confirmation && (
                                 <p className="text-sm text-red-600 mt-1">{errors.password_confirmation}</p>
                             )}

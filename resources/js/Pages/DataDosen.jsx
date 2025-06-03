@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import DashboardLayout from './DashboardLayout';
 
 export default function DataDosen({ dosen: initialDosen }) {
-  // Simpan dosen di state lokal biar bisa update realtime animasi
   const [dosen, setDosen] = useState(initialDosen);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ nama: '', nidn: '', email: '' });
@@ -15,7 +14,6 @@ export default function DataDosen({ dosen: initialDosen }) {
     if (confirm('Yakin ingin menghapus data dosen ini?')) {
       router.delete(`/data-dosen/${id}`, {
         onSuccess: () => {
-          // Update state lokal, hapus dosen yg dihapus
           setDosen((prev) => prev.filter((d) => d.id !== id));
         },
       });
@@ -32,10 +30,7 @@ export default function DataDosen({ dosen: initialDosen }) {
 
     router.post('/data-dosen', form, {
       onSuccess: (page) => {
-        // Dapat dosen baru dari response Inertia jika dikirim server
-        // Biasanya server redirect balik ke halaman index dg data terbaru
-        // Tapi kita optimis: tambahkan dosen baru ke state lokal jika ada
-        const newDosen = page.props.dosen.slice(-1)[0]; // anggap dosen baru ada di akhir array
+        const newDosen = page.props.dosen.slice(-1)[0];
         setDosen((prev) => [...prev, newDosen]);
 
         setForm({ nama: '', nidn: '', email: '' });
@@ -52,13 +47,13 @@ export default function DataDosen({ dosen: initialDosen }) {
       <Head title="Data Dosen" />
 
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h1 className="text-3xl font-extrabold text-teal-800 tracking-tight">
           Data Dosen
         </h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-teal-600 rounded-lg shadow-md
-            hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 transition"
+            hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-300 ease-in-out"
         >
           {showForm ? <X size={18} /> : <Plus size={18} />}
           {showForm ? 'Batal' : 'Tambah Dosen'}
@@ -74,48 +69,54 @@ export default function DataDosen({ dosen: initialDosen }) {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
             onSubmit={handleSubmit}
-            className="mb-6 bg-white rounded-xl shadow p-6 max-w-md"
+            className="mb-6 bg-white rounded-2xl shadow-lg p-8 max-w-md border border-gray-200"
           >
-            <div className="mb-4">
+            <div className="mb-5">
               <label className="block text-gray-700 font-semibold mb-1">Nama</label>
               <input
                 type="text"
                 name="nama"
                 value={form.nama}
                 onChange={handleInputChange}
-                className={`w-full border rounded px-3 py-2 focus:outline-none ${
-                  errors.nama ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 ${
+                  errors.nama
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-teal-400'
+                } transition`}
                 placeholder="Nama dosen"
               />
               {errors.nama && <p className="text-red-500 text-sm mt-1">{errors.nama}</p>}
             </div>
 
-            <div className="mb-4">
+            <div className="mb-5">
               <label className="block text-gray-700 font-semibold mb-1">NIDN</label>
               <input
                 type="text"
                 name="nidn"
                 value={form.nidn}
                 onChange={handleInputChange}
-                className={`w-full border rounded px-3 py-2 focus:outline-none ${
-                  errors.nidn ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 ${
+                  errors.nidn
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-teal-400'
+                } transition`}
                 placeholder="Nomor Induk Dosen Nasional"
               />
               {errors.nidn && <p className="text-red-500 text-sm mt-1">{errors.nidn}</p>}
             </div>
 
-            <div className="mb-4">
+            <div className="mb-6">
               <label className="block text-gray-700 font-semibold mb-1">Email</label>
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleInputChange}
-                className={`w-full border rounded px-3 py-2 focus:outline-none ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 ${
+                  errors.email
+                    ? 'border-red-500 focus:ring-red-400'
+                    : 'border-gray-300 focus:ring-teal-400'
+                } transition`}
                 placeholder="Email dosen"
               />
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -125,13 +126,13 @@ export default function DataDosen({ dosen: initialDosen }) {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100"
+                className="px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+                className="flex items-center gap-2 px-6 py-2 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 hover:shadow-lg transition duration-300"
               >
                 <Check size={16} />
                 Simpan
@@ -145,7 +146,7 @@ export default function DataDosen({ dosen: initialDosen }) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="overflow-x-auto bg-white rounded-xl shadow-lg border border-gray-200"
+        className="overflow-x-auto bg-white rounded-2xl shadow-xl border border-gray-200"
       >
         <table className="min-w-full table-auto text-sm md:text-base">
           <thead className="bg-gray-50 text-gray-700 font-semibold tracking-wide select-none">
@@ -166,19 +167,21 @@ export default function DataDosen({ dosen: initialDosen }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -15 }}
                     transition={{ duration: 0.3 }}
-                    className="hover:bg-teal-50 cursor-pointer"
+                    className="hover:bg-gradient-to-r hover:from-teal-50 hover:to-white cursor-pointer transition duration-300"
                   >
                     <td className="px-6 py-3 whitespace-nowrap font-medium">{d.nama}</td>
                     <td className="px-6 py-3 whitespace-nowrap">{d.nidn}</td>
                     <td className="px-6 py-3 whitespace-nowrap truncate max-w-xs">{d.email}</td>
                     <td className="px-6 py-3 text-center space-x-3">
-                      <button
+                      <motion.button
                         onClick={() => handleDelete(d.id)}
-                        className="inline-flex items-center text-red-600 hover:text-red-800 transition"
+                        whileHover={{ scale: 1.2, boxShadow: '0 0 8px rgba(220, 38, 38, 0.6)' }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition duration-300"
                         title="Hapus"
                       >
                         <Trash2 size={20} />
-                      </button>
+                      </motion.button>
                     </td>
                   </motion.tr>
                 ))
