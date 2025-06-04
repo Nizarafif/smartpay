@@ -3,7 +3,8 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: 'class', // 👈 Tambahkan ini
+    darkMode: 'class', // ⬅️ Tambahkan baris ini
+
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',

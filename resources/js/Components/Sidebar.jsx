@@ -8,6 +8,7 @@ import {
   X,
 } from 'lucide-react';
 import { Link, usePage, router } from '@inertiajs/react';
+import { motion } from 'framer-motion'; // import framer-motion
 
 const menuItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
@@ -72,41 +73,46 @@ export default function Sidebar({ collapsed, toggle }) {
             {menuItems.map(({ label, icon: Icon, href }, i) => {
               const isActive = url.startsWith(href);
               return (
-                <Link
+                <motion.div
                   key={i}
-                  href={href}
-                  className={`flex items-center gap-4 px-4 py-2 rounded-lg text-sm font-medium transition-colors select-none whitespace-nowrap
-                    ${
-                      isActive
-                        ? 'bg-teal-50 text-teal-600'
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-teal-600'
-                    }
-                  `}
-                  title={collapsed ? label : undefined}
-                  preserveScroll
-                  as="a"
-                  method="get"
+                  whileTap={{ scale: 0.85 }}
+                  className="rounded-lg"
                 >
-                  <span
-                    className={`flex items-center justify-center flex-shrink-0 w-8 h-8
+                  <Link
+                    href={href}
+                    className={`flex items-center gap-4 px-4 py-2 rounded-lg text-sm font-medium transition-colors select-none whitespace-nowrap
                       ${
                         isActive
-                          ? 'text-teal-600'
-                          : 'text-gray-400 group-hover:text-teal-600'
+                          ? 'bg-teal-50 text-teal-600'
+                          : 'text-gray-600 hover:bg-gray-100 hover:text-teal-600'
                       }
                     `}
+                    title={collapsed ? label : undefined}
+                    preserveScroll
+                    as="a"
+                    method="get"
                   >
-                    <Icon size={20} />
-                  </span>
-                  <span
-                    className={`transition-opacity duration-500 ease-in-out inline-block overflow-hidden whitespace-nowrap align-middle
-                      ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[140px]'}
-                    `}
-                    style={{ transitionProperty: 'opacity, max-width' }}
-                  >
-                    {label}
-                  </span>
-                </Link>
+                    <span
+                      className={`flex items-center justify-center flex-shrink-0 w-8 h-8
+                        ${
+                          isActive
+                            ? 'text-teal-600'
+                            : 'text-gray-400 group-hover:text-teal-600'
+                        }
+                      `}
+                    >
+                      <Icon size={20} />
+                    </span>
+                    <span
+                      className={`transition-opacity duration-500 ease-in-out inline-block overflow-hidden whitespace-nowrap align-middle
+                        ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[140px]'}
+                      `}
+                      style={{ transitionProperty: 'opacity, max-width' }}
+                    >
+                      {label}
+                    </span>
+                  </Link>
+                </motion.div>
               );
             })}
           </nav>

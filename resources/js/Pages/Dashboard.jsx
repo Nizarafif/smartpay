@@ -4,33 +4,33 @@ import Sidebar from '@/Components/Sidebar';
 import { DollarSign, User, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export default function Dashboard({ totalDosen, totalDibayar, totalGaji }) {
+export default function Dashboard({ totalDosen, totalDibayar, totalGaji, dosenDibayar = [] }) {
   const [collapsed, setCollapsed] = useState(false);
   const sidebarWidth = collapsed ? '5rem' : '16rem';
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.15, when: "beforeChildren" },
+      transition: { staggerChildren: 0.3, when: "beforeChildren" },
     },
   };
 
   const cardVariants = {
     hidden: { opacity: 0, y: 30, scale: 0.8 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
+    visible: {
+      opacity: 1,
+      y: 0,
       scale: 1,
       transition: {
         type: "spring",
         stiffness: 260,
         damping: 20,
-      }
+      },
     },
     hover: {
       scale: 1.05,
-      boxShadow: "0 15px 25px rgba(0,0,0,0.2)",
+      boxShadow: "0 15px 25px rgba(0,0,0,0.15)",
       transition: { type: 'spring', stiffness: 300 },
     },
     tap: {
@@ -42,7 +42,7 @@ export default function Dashboard({ totalDosen, totalDibayar, totalGaji }) {
   return (
     <>
       <Head title="Dashboard" />
-      <motion.div 
+      <motion.div
         className="flex min-h-screen bg-gradient-to-tr from-cyan-100 via-white to-teal-50"
         initial="hidden"
         animate="visible"
@@ -82,6 +82,7 @@ export default function Dashboard({ totalDosen, totalDibayar, totalGaji }) {
               Dashboard
             </motion.h1>
 
+            {/* Statistik */}
             <motion.div
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
               variants={containerVariants}
@@ -122,6 +123,46 @@ export default function Dashboard({ totalDosen, totalDibayar, totalGaji }) {
                   </div>
                 </motion.div>
               ))}
+            </motion.div>
+
+            {/* Tabel Dosen Dibayar */}
+            <motion.div
+              className="mt-12"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+            >
+              <h2 className="text-xl font-semibold text-teal-700 mb-4">Dosen yang Sudah Dibayar</h2>
+              {dosenDibayar.length === 0 ? (
+                <p className="text-gray-500">Belum ada dosen yang dibayar.</p>
+              ) : (
+                <div className="overflow-auto rounded-lg shadow border">
+                  <table className="min-w-full bg-white">
+                    <thead className="bg-teal-100 text-teal-800">
+                      <tr>
+                        <th className="py-2 px-4 text-left">Nama</th>
+                        <th className="py-2 px-4 text-left">NIDN</th>
+                        <th className="py-2 px-4 text-left">Email</th>
+                        <th className="py-2 px-4 text-left">Total Gaji</th>
+                        <th className="py-2 px-4 text-left">Tanggal Bayar</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dosenDibayar.map((item, index) => (
+                        <tr key={index} className="border-t">
+                          <td className="py-2 px-4">{item.dosen?.nama ?? '-'}</td>
+                          <td className="py-2 px-4">{item.dosen?.nidn ?? '-'}</td>
+                          <td className="py-2 px-4">{item.dosen?.email ?? '-'}</td>
+                          <td className="py-2 px-4">Rp {Number(item.total_gaji).toLocaleString('id-ID')}</td>
+                          <td className="py-2 px-4">
+                            {new Date(item.tanggal_bayar).toLocaleDateString('id-ID')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </motion.div>
           </main>
         </div>

@@ -1,30 +1,22 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DosenController;
+use App\Http\Controllers\GajiDosenController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use App\Models\Dosen;
 
-// Redirect root ke halaman login
+// Redirect ke login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Dashboard route – hanya bisa diakses setelah login dan verifikasi email
-Route::get('/dashboard', function () {
-    $totalDosen = Dosen::count();
-    $totalDibayar = Dosen::where('sudah_dibayar', true)->count();
-    $totalGaji = $totalDibayar * 1000000; // contoh gaji Rp1.000.000 per dosen
+// Dashboard – hanya untuk user login
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-    return Inertia::render('Dashboard', [
-        'totalDosen' => $totalDosen,
-        'totalDibayar' => $totalDibayar,
-        'totalGaji' => $totalGaji,
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-// Group route dengan middleware auth
+// Authenticated group
 Route::middleware('auth')->group(function () {
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,14 +29,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/data-dosen', [DosenController::class, 'store'])->name('data-dosen.store');
     Route::delete('/data-dosen/{id}', [DosenController::class, 'destroy'])->name('data-dosen.destroy');
 
-    // ✅ Gaji Dosen – Tambahkan ini
-    Route::get('/gaji-dosen', function () {
-        $dosens = Dosen::select('nama', 'nidn', 'email', 'sudah_dibayar')->get();
-        return Inertia::render('GajiDosen', [
-            'dosens' => $dosens,
-        ]);
-    })->name('gaji-dosen.index');
+    Route::get('/gaji-dosen', [GajiDosenController::class, 'index']);
+    Route::post('/gaji-dosen/{id}/bayar', [GajiDosenController::class, 'bayar']);
+    Route::delete('/gaji-dosen/{dosenId}/batal-bayar', [GajiDosenController::class, 'batalBayar']);
+    Route::delete('/gaji-dosen/{id}/hapus', [GajiDosenController::class, 'hapus']);
 });
 
-// Auth routes
 require __DIR__.'/auth.php';

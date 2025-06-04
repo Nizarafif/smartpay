@@ -1,24 +1,40 @@
-// Navbar.jsx
 import React, { useEffect, useState } from 'react';
 import { Search, Bell, Settings, Sun, Moon } from 'lucide-react';
 
 export default function Navbar({ sidebarWidth }) {
   const [darkMode, setDarkMode] = useState(false);
 
+  // Fungsi enable/disable dark mode tanpa library eksternal
+  const enable = () => document.documentElement.classList.add('dark');
+  const disable = () => document.documentElement.classList.remove('dark');
+
   useEffect(() => {
-    // Cek tema yang tersimpan di localStorage
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
-    const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    const isDark = savedTheme
+      ? savedTheme === 'dark'
+      : systemPrefersDark;
 
     setDarkMode(isDark);
-    document.documentElement.classList.toggle('dark', isDark);
+    if (isDark) {
+      enable();
+    } else {
+      disable();
+    }
   }, []);
 
   const toggleDarkMode = () => {
-    const newDarkMode = !darkMode;
-    setDarkMode(newDarkMode);
-    document.documentElement.classList.toggle('dark', newDarkMode);
-    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light');
+    const newDark = !darkMode;
+    setDarkMode(newDark);
+
+    if (newDark) {
+      enable();
+      localStorage.setItem('theme', 'dark');
+    } else {
+      disable();
+      localStorage.setItem('theme', 'light');
+    }
   };
 
   return (

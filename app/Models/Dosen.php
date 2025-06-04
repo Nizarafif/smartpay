@@ -3,17 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Dosen extends Model
 {
-    // Jika tabel di database bernama "dosens", bagian ini bisa diabaikan.
-    // Tapi kalau nama tabel-nya "dosen", kamu perlu menentukan secara eksplisit:
-    protected $table = 'dosen';
+    use HasFactory;
 
-    // Kolom yang boleh diisi melalui mass assignment (opsional, tapi bagus untuk keamanan)
-    protected $fillable = [
-        'nama',
-        'nidn',
-        'email',
-    ];
+    protected $fillable = ['nama', 'nidn', 'email'];
+
+    public function gaji()
+    {
+        return $this->hasOne(GajiDosen::class);
+    }
 }
