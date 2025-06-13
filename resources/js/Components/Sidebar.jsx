@@ -3,18 +3,13 @@ import {
   LayoutDashboard,
   Users,
   DollarSign,
+  History,
   LogOut,
   Menu,
   X,
 } from 'lucide-react';
 import { Link, usePage, router } from '@inertiajs/react';
-import { motion } from 'framer-motion'; // import framer-motion
-
-const menuItems = [
-  { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-  { label: 'Data Dosen', icon: Users, href: '/data-dosen' },
-  { label: 'Gaji Dosen', icon: DollarSign, href: '/gaji-dosen' },
-];
+import { motion } from 'framer-motion';
 
 export default function Sidebar({ collapsed, toggle }) {
   const { url } = usePage();
@@ -38,10 +33,18 @@ export default function Sidebar({ collapsed, toggle }) {
     });
   }
 
+  const menuItems = [
+    { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+    { label: 'Data Dosen', icon: Users, href: '/data-dosen' },
+    { label: 'Gaji Dosen', icon: DollarSign, href: '/gaji-dosen' },
+    { label: 'Riwayat Pembayaran', icon: History, href: '/riwayat-pembayaran' },
+  ];
+
   return (
     <>
+      {/* Sidebar Panel */}
       <aside
-        className="fixed top-0 left-0 h-screen bg-white border-r border-gray-200 flex flex-col justify-between z-30 transition-all duration-500 ease-in-out shadow-sm"
+        className="fixed top-0 left-0 h-screen bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col justify-between z-30 transition-all duration-500 ease-in-out shadow-sm"
         style={{ width: collapsed ? '5rem' : '16rem' }}
       >
         <div className="p-4">
@@ -51,60 +54,48 @@ export default function Sidebar({ collapsed, toggle }) {
             style={{ minHeight: '3.5rem' }}
           >
             <h1
-              className={`text-3xl font-black text-teal-600 tracking-wide select-none overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out font-poppins text-center
+              className={`text-3xl font-black text-teal-600 dark:text-teal-400 tracking-wide select-none overflow-hidden whitespace-nowrap transition-all duration-500 ease-in-out font-poppins text-center
                 ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[200px]'}
               `}
               style={{ transitionProperty: 'opacity, max-width' }}
             >
-              Smart<span className="text-gray-800">Pay</span>
+              Smart<span className="text-gray-800 dark:text-white">Pay</span>
             </h1>
 
             <button
               onClick={toggle}
-              className="absolute top-0 right-0 p-2 rounded-md hover:bg-teal-100 text-teal-600 transition-colors"
+              className="absolute top-0 right-0 p-2 rounded-md hover:bg-teal-100 dark:hover:bg-gray-800 text-teal-600 dark:text-teal-300 transition-colors"
               title="Toggle Sidebar"
             >
               {collapsed ? <Menu size={24} /> : <X size={24} />}
             </button>
           </div>
 
-          {/* Navigation */}
+          {/* Menu */}
           <nav className="space-y-1 font-poppins">
             {menuItems.map(({ label, icon: Icon, href }, i) => {
               const isActive = url.startsWith(href);
               return (
-                <motion.div
-                  key={i}
-                  whileTap={{ scale: 0.85 }}
-                  className="rounded-lg"
-                >
+                <motion.div key={i} whileTap={{ scale: 0.95 }} className="rounded-lg">
                   <Link
                     href={href}
                     className={`flex items-center gap-4 px-4 py-2 rounded-lg text-sm font-medium transition-colors select-none whitespace-nowrap
                       ${
                         isActive
-                          ? 'bg-teal-50 text-teal-600'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-teal-600'
+                          ? 'bg-teal-50 dark:bg-teal-800 text-teal-600 dark:text-teal-100'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-teal-600 dark:hover:text-teal-200'
                       }
                     `}
-                    title={collapsed ? label : undefined}
                     preserveScroll
                     as="a"
                     method="get"
+                    title={collapsed ? label : undefined}
                   >
-                    <span
-                      className={`flex items-center justify-center flex-shrink-0 w-8 h-8
-                        ${
-                          isActive
-                            ? 'text-teal-600'
-                            : 'text-gray-400 group-hover:text-teal-600'
-                        }
-                      `}
-                    >
+                    <span className="flex items-center justify-center w-8 h-8 text-teal-600 dark:text-teal-300">
                       <Icon size={20} />
                     </span>
                     <span
-                      className={`transition-opacity duration-500 ease-in-out inline-block overflow-hidden whitespace-nowrap align-middle
+                      className={`transition-opacity duration-500 ease-in-out overflow-hidden whitespace-nowrap
                         ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[140px]'}
                       `}
                       style={{ transitionProperty: 'opacity, max-width' }}
@@ -118,17 +109,16 @@ export default function Sidebar({ collapsed, toggle }) {
           </nav>
         </div>
 
-        {/* Footer: Logout */}
+        {/* Logout Button */}
         <div
           onClick={() => setShowLogoutModal(true)}
           title="Logout"
-          className="flex items-center cursor-pointer gap-4 mb-4 px-4 py-2 rounded-md text-red-600 font-semibold select-none transition-colors hover:bg-red-100"
+          className="flex items-center cursor-pointer gap-4 mb-4 px-4 py-2 rounded-md text-red-600 dark:text-red-400 font-semibold select-none transition-colors hover:bg-red-100 dark:hover:bg-red-900"
           style={{ userSelect: 'none' }}
         >
-          <span className="w-8 h-8 flex items-center justify-center text-red-600 flex-shrink-0">
+          <span className="w-8 h-8 flex items-center justify-center flex-shrink-0">
             <LogOut size={20} />
           </span>
-
           <span
             className={`inline-block overflow-hidden whitespace-nowrap align-middle transition-all duration-500 ease-in-out
               ${collapsed ? 'opacity-0 max-w-0' : 'opacity-100 max-w-[100px]'}
@@ -149,21 +139,21 @@ export default function Sidebar({ collapsed, toggle }) {
           onClick={closeModal}
         >
           <div
-            className={`bg-white rounded-lg shadow-lg p-6 w-80 max-w-full transform transition-all duration-300 ${
+            className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-80 max-w-full transform transition-all duration-300 ${
               animateModal ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
             }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-100">
               Konfirmasi Logout
             </h2>
-            <p className="mb-6 text-gray-600">
+            <p className="mb-6 text-gray-600 dark:text-gray-300">
               Apakah kamu yakin ingin keluar dari aplikasi?
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={closeModal}
-                className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
               >
                 Batal
               </button>

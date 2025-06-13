@@ -6,16 +6,26 @@ import DashboardLayout from './DashboardLayout';
 
 export default function DataDosen({ dosen: initialDosen }) {
   const [dosen, setDosen] = useState(initialDosen);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState({ nama: '', nidn: '', email: '' });
   const [errors, setErrors] = useState({});
+
+  const backdrop = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.2 } },
+    exit: { opacity: 0, transition: { duration: 0.2 } },
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
+  };
 
   function handleDelete(id) {
     if (confirm('Yakin ingin menghapus data dosen ini?')) {
       router.delete(`/data-dosen/${id}`, {
-        onSuccess: () => {
-          setDosen((prev) => prev.filter((d) => d.id !== id));
-        },
+        onSuccess: () => setDosen((prev) => prev.filter((d) => d.id !== id)),
       });
     }
   }
@@ -27,216 +37,184 @@ export default function DataDosen({ dosen: initialDosen }) {
   function handleSubmit(e) {
     e.preventDefault();
     setErrors({});
-
     router.post('/data-dosen', form, {
       onSuccess: (page) => {
         const newDosen = page.props.dosen.slice(-1)[0];
         setDosen((prev) => [...prev, newDosen]);
-
         setForm({ nama: '', nidn: '', email: '' });
-        setShowForm(false);
+        setShowModal(false);
       },
-      onError: (errs) => {
-        setErrors(errs);
-      },
+      onError: (errs) => setErrors(errs),
     });
   }
-
-  // Variants untuk animasi judul dan card/container
-  const containerVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
-    exit: { opacity: 0, y: -15, transition: { duration: 0.4, ease: 'easeIn' } },
-  };
-
-  const titleVariants = {
-    hidden: { opacity: 0, x: -20 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-    exit: { opacity: 0, x: -20, transition: { duration: 0.4, ease: 'easeIn' } },
-  };
-
-  const formVariants = {
-    hidden: { opacity: 0, y: -10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeInOut' } },
-    exit: { opacity: 0, y: -20, transition: { duration: 0.3, ease: 'easeInOut' } },
-  };
 
   return (
     <DashboardLayout>
       <Head title="Data Dosen" />
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key="container"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          className="space-y-6"
-        >
-          {/* Judul dan tombol dengan animasi */}
-          <motion.div
-            variants={titleVariants}
-            className="flex items-center justify-between"
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-extrabold text-teal-800 dark:text-teal-300 tracking-tight">
+            Data Dosen
+          </h1>
+          <button
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-teal-600 rounded-lg shadow-md hover:bg-teal-700 dark:bg-teal-700 dark:hover:bg-teal-600 transition duration-300 ease-in-out"
           >
-            <h1 className="text-3xl font-extrabold text-teal-800 tracking-tight">
-              Data Dosen
-            </h1>
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="inline-flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-teal-600 rounded-lg shadow-md
-                hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 transition duration-300 ease-in-out"
-            >
-              {showForm ? <X size={18} /> : <Plus size={18} />}
-              {showForm ? 'Batal' : 'Tambah Dosen'}
-            </button>
-          </motion.div>
+            <Plus size={18} />
+            Tambah Dosen
+          </button>
+        </div>
 
-          {/* Form dengan animasi fade + slide */}
-          <AnimatePresence mode="wait">
-            {showForm && (
-              <motion.form
-                key="form"
-                variants={formVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                onSubmit={handleSubmit}
-                className="bg-white rounded-2xl shadow-lg p-8 max-w-md border border-gray-200"
-              >
-                <div className="mb-5">
-                  <label className="block text-gray-700 font-semibold mb-1">Nama</label>
+        <div className="overflow-x-auto rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 scrollbar-hide">
+          <table className="min-w-full table-auto text-sm md:text-base">
+            <thead className="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-100 font-semibold tracking-wide">
+              <tr>
+                <th className="px-6 py-4 text-left">Nama</th>
+                <th className="px-6 py-4 text-left">NIDN</th>
+                <th className="px-6 py-4 text-left">Email</th>
+                <th className="px-6 py-4 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-700 dark:text-gray-100">
+              <AnimatePresence>
+                {dosen.length > 0 ? (
+                  dosen.map((d) => (
+                    <motion.tr
+                      key={d.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                      className="hover:bg-gradient-to-r hover:from-teal-50 dark:hover:from-gray-800 hover:to-white dark:hover:to-gray-900 cursor-pointer transition duration-300"
+                    >
+                      <td className="px-6 py-3 font-medium">{d.nama}</td>
+                      <td className="px-6 py-3">{d.nidn}</td>
+                      <td className="px-6 py-3 truncate max-w-xs">{d.email}</td>
+                      <td className="px-6 py-3 text-center space-x-3">
+                        <motion.button
+                          onClick={() => handleDelete(d.id)}
+                          whileHover={{ scale: 1.2 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 text-red-600 hover:bg-red-200 dark:hover:bg-red-800 transition duration-300"
+                          title="Hapus"
+                        >
+                          <Trash2 size={20} />
+                        </motion.button>
+                      </td>
+                    </motion.tr>
+                  ))
+                ) : (
+                  <tr className="text-center text-gray-500 dark:text-gray-400">
+                    <td colSpan="4" className="py-8">Tidak ada data dosen.</td>
+                  </tr>
+                )}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modal Tambah Dosen */}
+      <AnimatePresence>
+        {showModal && (
+          <motion.div
+            className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
+            variants={backdrop}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <motion.div
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-md w-full p-6 mx-4"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-bold text-teal-700 dark:text-teal-300">Tambah Dosen</h2>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Nama */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200">Nama</label>
                   <input
                     type="text"
                     name="nama"
                     value={form.nama}
                     onChange={handleInputChange}
-                    className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 ${
-                      errors.nama
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-teal-400'
-                    } transition`}
                     placeholder="Nama dosen"
+                    className={`w-full px-4 py-2 rounded-lg border ${
+                      errors.nama ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                    } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 ${
+                      errors.nama ? 'focus:ring-red-400' : 'focus:ring-teal-500'
+                    }`}
                   />
-                  {errors.nama && <p className="text-red-500 text-sm mt-1">{errors.nama}</p>}
+                  {errors.nama && <p className="text-sm text-red-500 mt-1">{errors.nama}</p>}
                 </div>
-
-                <div className="mb-5">
-                  <label className="block text-gray-700 font-semibold mb-1">NIDN</label>
+                {/* NIDN */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200">NIDN</label>
                   <input
                     type="text"
                     name="nidn"
                     value={form.nidn}
                     onChange={handleInputChange}
-                    className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 ${
-                      errors.nidn
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-teal-400'
-                    } transition`}
                     placeholder="Nomor Induk Dosen Nasional"
+                    className={`w-full px-4 py-2 rounded-lg border ${
+                      errors.nidn ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                    } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 ${
+                      errors.nidn ? 'focus:ring-red-400' : 'focus:ring-teal-500'
+                    }`}
                   />
-                  {errors.nidn && <p className="text-red-500 text-sm mt-1">{errors.nidn}</p>}
+                  {errors.nidn && <p className="text-sm text-red-500 mt-1">{errors.nidn}</p>}
                 </div>
-
-                <div className="mb-6">
-                  <label className="block text-gray-700 font-semibold mb-1">Email</label>
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200">Email</label>
                   <input
                     type="email"
                     name="email"
                     value={form.email}
                     onChange={handleInputChange}
-                    className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 ${
-                      errors.email
-                        ? 'border-red-500 focus:ring-red-400'
-                        : 'border-gray-300 focus:ring-teal-400'
-                    } transition`}
                     placeholder="Email dosen"
+                    className={`w-full px-4 py-2 rounded-lg border ${
+                      errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                    } bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 ${
+                      errors.email ? 'focus:ring-red-400' : 'focus:ring-teal-500'
+                    }`}
                   />
-                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                  {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
                 </div>
 
-                <div className="flex justify-end gap-4">
+                {/* Aksi */}
+                <div className="flex justify-end gap-3">
                   <button
                     type="button"
-                    onClick={() => setShowForm(false)}
-                    className="px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center gap-2 px-6 py-2 bg-teal-600 text-white rounded-lg shadow-md hover:bg-teal-700 hover:shadow-lg transition duration-300"
+                    className="flex items-center gap-2 px-5 py-2 bg-teal-600 text-white rounded-lg shadow hover:bg-teal-700"
                   >
                     <Check size={16} />
                     Simpan
                   </button>
                 </div>
-              </motion.form>
-            )}
-          </AnimatePresence>
-
-          {/* Card / tabel dosen dengan animasi container + baris */}
-          <motion.div
-            key="table"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="overflow-x-auto rounded-2xl shadow-xl border border-gray-200 scrollbar-hide"
-          >
-            <table className="min-w-full table-auto text-sm md:text-base">
-              <thead className="bg-gray-50 text-gray-700 font-semibold tracking-wide select-none">
-                <tr>
-                  <th className="px-6 py-4 text-left">Nama</th>
-                  <th className="px-6 py-4 text-left">NIDN</th>
-                  <th className="px-6 py-4 text-left">Email</th>
-                  <th className="px-6 py-4 text-center">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                <AnimatePresence>
-                  {dosen.length > 0 ? (
-                    dosen.map((d) => (
-                      <motion.tr
-                        key={d.id}
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -15 }}
-                        transition={{ duration: 0.3 }}
-                        className="hover:bg-gradient-to-r hover:from-teal-50 hover:to-white cursor-pointer transition duration-300"
-                      >
-                        <td className="px-6 py-3 whitespace-nowrap font-medium">{d.nama}</td>
-                        <td className="px-6 py-3 whitespace-nowrap">{d.nidn}</td>
-                        <td className="px-6 py-3 whitespace-nowrap truncate max-w-xs">{d.email}</td>
-                        <td className="px-6 py-3 text-center space-x-3">
-                          <motion.button
-                            onClick={() => handleDelete(d.id)}
-                            whileHover={{ scale: 1.2, boxShadow: '0 0 8px rgba(220, 38, 38, 0.6)' }}
-                            whileTap={{ scale: 0.95 }}
-                            className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition duration-300"
-                            title="Hapus"
-                          >
-                            <Trash2 size={20} />
-                          </motion.button>
-                        </td>
-                      </motion.tr>
-                    ))
-                  ) : (
-                    <motion.tr
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-center text-gray-500"
-                    >
-                      <td colSpan="4" className="py-8">
-                        Tidak ada data dosen.
-                      </td>
-                    </motion.tr>
-                  )}
-                </AnimatePresence>
-              </tbody>
-            </table>
+              </form>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        )}
       </AnimatePresence>
     </DashboardLayout>
   );

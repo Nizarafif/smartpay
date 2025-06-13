@@ -23,6 +23,7 @@
         "vite": "^6.2.4"
     },
     "dependencies": {
+        "@inertiajs/inertia": "^0.11.1",
         "@rbnd/react-dark-mode": "^2.0.2",
         "dark-mode-light-mode": "^1.4.1",
         "framer-motion": "^12.15.0",
